@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import DataLoader
 
 
-def training_loop(epochs=10, learning_rate=0.001, batch_size=32):
+def training_loop(epochs: int, learning_rate: float, batch_size: int):
     labeled_df = label_images()
     images, labels = image_to_tensors(labeled_df)
     

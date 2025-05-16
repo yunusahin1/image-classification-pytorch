@@ -2,7 +2,7 @@ import yaml
 import os
 
 
-def config_yaml(config_path="config.yaml"):
+def config_yaml(config_path: str = "config.yaml") -> dict:
     if os.path.exists(config_path):
         with open(config_path, 'r') as f:
             config = yaml.safe_load(f)
