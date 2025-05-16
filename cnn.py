@@ -2,14 +2,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class CNN(nn.Module):
     def __init__(self):
-        super(CNN, self).__init__()  # Fixed super() call
-        self.conv1 = nn.Conv2d(3, 6, 5)
-        self.pool1 = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.pool2 = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(16 * 5 * 5, 120)
+        super(CNN, self).__init__()
+        self.conv1 = nn.Conv2d(3, 12, 5) # (12, 252, 252)
+        self.pool = nn.MaxPool2d(2, 2) # (12, 126, 126)
+        self.conv2 = nn.Conv2d(12, 24, 5) # (24, 122, 122) (24, 61, 61)
+        self.fc1 = nn.Linear(24 * 61 * 61, 120) # flatten (24 * 61 * 61)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 3)
 

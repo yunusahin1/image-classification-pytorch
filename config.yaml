@@ -1,2 +1,14 @@
 preprocessing:
-  augmentation: true
+  augmentation: false
+
+training:
+  epochs: 10
+  learning_rate: 0.001
+  batch_size: 32
+
+save_model: true
+model_dir: "./models"
+
+plot_training: true
+save_plots: true
+plots_dir: "./plots"
