@@ -4,6 +4,7 @@ from torch import nn
 from image_preprocessor import label_images, image_to_tensors, create_train_test_split
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
+from torch.utils.data import DataLoader
 
 
 def training_loop(epochs=10, learning_rate=0.001, batch_size=32):
@@ -14,11 +15,10 @@ def training_loop(epochs=10, learning_rate=0.001, batch_size=32):
     numeric_labels = label_encoder.fit_transform(labels)
     
     data = create_train_test_split(images, numeric_labels)
-    train_images, test_images = data['train_images'], data['test_images']
-    train_labels, test_labels = data['train_labels'], data['test_labels']
+    train_dataset, test_dataset = data['train_dataset'], data['test_dataset']
     
-    train_labels = torch.tensor(train_labels, dtype=torch.long)
-    test_labels = torch.tensor(test_labels, dtype=torch.long)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     cnn = CNN().to(device)
@@ -37,13 +37,8 @@ def training_loop(epochs=10, learning_rate=0.001, batch_size=32):
         correct = 0
         total = 0
         
-        num_batches = int(np.ceil(len(train_images) / batch_size))
-        for i in range(num_batches):
-            start_idx = i * batch_size
-            end_idx = min((i + 1) * batch_size, len(train_images))
-            
-            batch_images = train_images[start_idx:end_idx].to(device)
-            batch_labels = train_labels[start_idx:end_idx].to(device)
+        for batch_images, batch_labels in train_loader:
+            batch_images, batch_labels = batch_images.to(device), batch_labels.to(device)
             
             optimizer.zero_grad()
             
@@ -69,13 +64,8 @@ def training_loop(epochs=10, learning_rate=0.001, batch_size=32):
         total = 0
         
         with torch.no_grad():
-            num_batches = int(np.ceil(len(test_images) / batch_size))
-            for i in range(num_batches):
-                start_idx = i * batch_size
-                end_idx = min((i + 1) * batch_size, len(test_images))
-                
-                batch_images = test_images[start_idx:end_idx].to(device)
-                batch_labels = test_labels[start_idx:end_idx].to(device)
+            for batch_images, batch_labels in test_loader:
+                batch_images, batch_labels = batch_images.to(device), batch_labels.to(device)
                 
                 outputs = cnn(batch_images)
                 loss = loss_fn(outputs, batch_labels)

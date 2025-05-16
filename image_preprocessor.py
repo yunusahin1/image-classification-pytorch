@@ -6,7 +6,18 @@ import torchvision.transforms as transforms
 import torch
 from PIL import Image
 from sklearn.model_selection import train_test_split
-
+from torch.utils.data import Dataset
+class ImageDataset(Dataset):
+    def __init__(self, images: torch.Tensor, labels: List):
+        self.images = images
+        self.labels = torch.tensor(labels, dtype=torch.long)
+    
+    def __len__(self):
+        return len(self.images)
+    
+    def __getitem__(self, idx):
+        return self.images[idx], self.labels[idx]
+    
 def label_images(prefix: str = './data/animals/') -> pd.DataFrame:
     label_json = {'file_name': [], 'label': []}
     folders = os.listdir(prefix)
@@ -59,15 +70,17 @@ def data_augmentation(images: torch.Tensor) -> torch.Tensor:
     all_images = torch.cat([images, torch.stack(augmented_images)], dim=0)
     return all_images
 
+
 def create_train_test_split(images: torch.Tensor, labels: List, test_size: float = 0.2, random_state: int = 42) -> Dict[str, object]:
     
     X_train, X_test, y_train, y_test = train_test_split(
         images, labels, test_size=test_size, random_state=random_state, stratify=labels
     )
     
+    train_dataset = ImageDataset(X_train, y_train)
+    test_dataset = ImageDataset(X_test, y_test)
+    
     return {
-        'train_images': X_train,
-        'test_images': X_test,
-        'train_labels': y_train,
-        'test_labels': y_test
+        'train_dataset': train_dataset,
+        'test_dataset': test_dataset
     }
