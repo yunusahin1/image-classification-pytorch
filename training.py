@@ -2,7 +2,6 @@ from cnn import CNN
 import torch
 from torch import nn
 from image_preprocessor import label_images, image_to_tensors, create_train_test_split
-import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import DataLoader
 
